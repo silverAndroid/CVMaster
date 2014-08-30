@@ -19,5 +19,6 @@
     <string name="quick_fight">Quick Fight</string>
     <string name="invite_player">Invite Player</string>
     <string name="show_invitations">Show Invitations</string>
+    <string name="title_activity_deck_select">DeckSelectActivity</string>
 
 </resources>
