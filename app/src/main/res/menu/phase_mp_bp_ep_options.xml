@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/main_phase"
+          android:title="Main Phase" />
+
+    <item android:id="@+id/battle_phase"
+          android:title="Battle Phase" />
+
+    <item android:id="@+id/end_phase"
+          android:title="End Phase" />
+
+</menu>
