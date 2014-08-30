@@ -61,9 +61,10 @@
         android:layout_height="wrap_content"
         android:text="Sign Out"
         android:id="@+id/btn_sign_out"
-        android:layout_alignTop="@+id/btn_sign_in"
-        android:layout_alignLeft="@+id/btn_sign_in"
-        android:layout_alignStart="@+id/btn_sign_in"
+        android:layout_below="@+id/btn_show_invitations"
+        android:layout_alignLeft="@+id/btn_show_invitations"
+        android:layout_alignStart="@+id/btn_show_invitations"
+        android:layout_marginTop="40dp"
         android:visibility="gone"/>
 
 </RelativeLayout>
