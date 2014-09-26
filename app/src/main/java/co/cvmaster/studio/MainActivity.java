@@ -1,7 +1,6 @@
 package co.cvmaster.studio;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -14,15 +13,16 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.example.games.basegameutils.BaseGameActivity;
-
+//all the comments with pixel numbers in it are the x and y values used for the Nexus 7 (2012)
 
 public class MainActivity extends Activity {
 
-    final int buttonY = 500;
-
+    private double buttonY;
     private Deck deck;
     private Database db;
+
+    private ImageView[] deckImages;
+    private ImageView[] enemyDeckImages;
 
     static TextView deckSize;
     static Button[] phases;
@@ -38,8 +38,11 @@ public class MainActivity extends Activity {
     static ImageView[] enemyDamageZone;
     static Player player;
     static Enemy enemy;
+    static float densityFactor;
+    static RelativeLayout rl;
+    static String playerDeckName;
+    static String enemyDeckName;
 
-    RelativeLayout rl;
     Field field;
 
     @SuppressWarnings("ResourceType")
@@ -48,34 +51,35 @@ public class MainActivity extends Activity {
 
         super.onCreate(savedInstanceState);
 
-        rl = new RelativeLayout(this);
+        densityFactor = getResources().getDisplayMetrics().density;
         db = new Database(this);
-        deck = new Deck(db, this);
+        deck = new Deck(db, this, playerDeckName, enemyDeckName);
         field = new Field(this);
         player = new Player(deck, this);
         enemy = new Enemy(deck, this);
-        ImageView[] deckImages = new ImageView[30];
-        ImageView[] enemyDeckImages = new ImageView[30];
+        rl = new RelativeLayout(this);
+        deckImages = new ImageView[30];
+        enemyDeckImages = new ImageView[30];
+        buttonY = 60037.478395888633479449546379327 * (densityFactor / 160); //500px
 
         ImageView playingMat = new ImageView(this);
         RelativeLayout.LayoutParams playingMatParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
         playingMatParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-        playingMatParams.leftMargin = 25;
+        playingMatParams.leftMargin = (int) (3001.8739197944316739724773189664 * (densityFactor / 160)); //25px
         playingMatParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        playingMatParams.height = 1100;
-        playingMatParams.width = 750;
+        playingMatParams.height = (int) (132082.45247095499365478900203452 * (densityFactor / 160)); //1100px
+        playingMatParams.width = (int) (90056.217593832950219174319568991 * (densityFactor / 160));
         playingMat.setImageResource(R.drawable.vanguard_mat);
         playingMat.setScaleType(ImageView.ScaleType.FIT_CENTER);
         playingMat.setLayoutParams(playingMatParams);
-
         rl.addView(playingMat);
 
         for (int i = 0; i < 30; i++) {
             deckImages[i] = new ImageView(this);
             deckImages[i].setAdjustViewBounds(true);
-            deckImages[i].setX(655 + i);
-            deckImages[i].setY(680 + i);
+            deckImages[i].setX((float) ((655 + i) / 0.00832813125) * (densityFactor / 160));
+            deckImages[i].setY((float) ((680 + i) / 0.00832813125) * (densityFactor / 160));
             deckImages[i].setImageResource(R.drawable.card_back);
             rl.addView(deckImages[i]);
         }
@@ -83,45 +87,47 @@ public class MainActivity extends Activity {
         for (int i = 0; i < 30; i++) {
             enemyDeckImages[i] = new ImageView(this);
             enemyDeckImages[i].setAdjustViewBounds(true);
-            enemyDeckImages[i].setX(51 + i);
-            enemyDeckImages[i].setY(304 + i);
+            enemyDeckImages[i].setX((float) ((51 + i) / 0.00832813125) * (densityFactor / 160));
+            enemyDeckImages[i].setY((float) ((304 + i) / 0.00832813125) * (densityFactor / 160));
             enemyDeckImages[i].setImageResource(R.drawable.card_back_opponent);
             rl.addView(enemyDeckImages[i]);
         }
 
         vanguard = new ImageView(this);
         vanguard.setAdjustViewBounds(true);
-        vanguard.setX(370);
-        vanguard.setY(710);
+        vanguard.setX((float) 44427.734012957588774792664320702 * (densityFactor / 160)); //370px
+        vanguard.setY((float) (85253.219322161859540818355858645 * (densityFactor / 160))); //710px
         vanguard.setOnClickListener(new OnVanguardClickListener(this, player));
-        rl.addView(vanguard);
         Player.vanguard.setCard("Heroic Spirit Seeker, Mark");
         vanguard.setImageResource(Player.vanguard.getDrawableResource());
+        rl.addView(vanguard);
 
         enemyVanguard = new ImageView(this);
         enemyVanguard.setAdjustViewBounds(true);
-        enemyVanguard.setX(370);
-        enemyVanguard.setY(300);
-        rl.addView(enemyVanguard);
+        enemyVanguard.setX((float) 44427.734012957588774792664320702 * (densityFactor / 160)); //370px
+        enemyVanguard.setY((float) 36022.487037533180087669727827596 * (densityFactor / 160)); //300px
         Enemy.vanguard.setCard("Genius Liberator, Woltimer");
         enemyVanguard.setImageResource(Enemy.vanguard.getDrawableResourceOpponent());
         enemyVanguard.setOnClickListener(new OnEnemyVanguardClickListener(this));
+        rl.addView(enemyVanguard);
 
         vanguardPower = new TextView(this);
-        vanguardPower.setX(365);
-        vanguardPower.setY(795);
+        vanguardPower.setX((float) (43827.359228998702439998168856909 * (densityFactor / 160))); //365px
+        vanguardPower.setY((float) (95459.59064946292723232477874313 * (densityFactor / 160))); //795px
         vanguardPower.setText(String.valueOf(Player.vanguard.getPower()));
         vanguardPower.setGravity(Gravity.CENTER);
         vanguardPower.setBackgroundColor(Color.WHITE);
-        rl.addView(vanguardPower, 75, 25);
+        rl.addView(vanguardPower, (int) (9005.6217593832950219174319568991 * (densityFactor / 160)), (int) (3001.8739197944316739724773189664 * (densityFactor /
+                160))); //75px, 25px
 
         enemyVanguardPower = new TextView(this);
-        enemyVanguardPower.setX(365);
-        enemyVanguardPower.setY(300);
+        enemyVanguardPower.setX((float) (43827.359228998702439998168856909 * (densityFactor / 160))); //365px
+        enemyVanguardPower.setY((float) (36022.487037533180087669727827596 * (densityFactor / 160))); //300px
         enemyVanguardPower.setText(String.valueOf(Enemy.vanguard.getPower()));
         enemyVanguardPower.setGravity(Gravity.CENTER);
         enemyVanguardPower.setBackgroundColor(Color.WHITE);
-        rl.addView(enemyVanguardPower, 75, 25);
+        rl.addView(enemyVanguardPower, (int) (9005.6217593832950219174319568991 * (densityFactor / 160)), (int) (3001.8739197944316739724773189664 * (densityFactor /
+                160))); //75px, 25px
 
         rearguard = new ImageView[5];
         rearguardPower = new TextView[5];
@@ -130,15 +136,15 @@ public class MainActivity extends Activity {
             rearguardPower[i] = new TextView(this);
             rearguard[i].setAdjustViewBounds(true);
             if (i >= 2) {
-                rearguard[i].setX(220 + ((i - 2) * 150));
-                rearguardPower[i].setX(215 + ((i - 2) * 150));
-                rearguard[i].setY(855);
-                rearguardPower[i].setY(940);
+                rearguard[i].setX((float) ((220 + ((i - 2) * 150) / 0.00832813125) * (densityFactor / 160)));
+                rearguardPower[i].setX((float) ((215 + ((i - 2) * 150) / 0.00832813125) * (densityFactor / 160)));
+                rearguard[i].setY((float) (102664.08805696956324985872430865 * (densityFactor / 160))); //855px
+                rearguardPower[i].setY((float) (112870.45938427063094136514719314 * (densityFactor / 160))); //940px
             } else {
-                rearguard[i].setX(220 + i * 300);
-                rearguardPower[i].setX(215 + i * 300);
-                rearguard[i].setY(710);
-                rearguardPower[i].setY(795);
+                rearguard[i].setX((float) ((220 + i * 300 / 0.00832813125) * (densityFactor / 160)));
+                rearguardPower[i].setX((float) ((215 + i * 300 / 0.00832813125) * (densityFactor / 160)));
+                rearguard[i].setY((float) (85253.219322161859540818355858645 * (densityFactor / 160))); //710px
+                rearguardPower[i].setY((float) (95459.59064946292723232477874313 * (densityFactor / 160))); //795px
             }
             rearguard[i].setImageResource(R.drawable.empty);
             rearguard[i].setId(i);
@@ -152,7 +158,8 @@ public class MainActivity extends Activity {
             } catch (NullPointerException npe) {
 
             }
-            rl.addView(rearguardPower[i], 75, 25);
+            rl.addView(rearguardPower[i], (int) (9005.6217593832950219174319568991 * (densityFactor / 160)), (int) (3001.8739197944316739724773189664 * (densityFactor /
+                    160))); //75px, 25px
         }
 
         enemyRearguard = new ImageView[5];
@@ -162,11 +169,11 @@ public class MainActivity extends Activity {
             enemyRearguardPower[i] = new TextView(this);
             enemyRearguard[i].setAdjustViewBounds(true);
             if (i >= 2) {
-                enemyRearguard[i].setX(520 - (i - 2) * 150);
-                enemyRearguard[i].setY(150);
+                enemyRearguard[i].setX((float) ((520 - (i - 2) * 150) / 0.00832813125) * (densityFactor / 160));
+                enemyRearguard[i].setY((float) (18011.243518766590043834863913798 * (densityFactor / 160))); //150px
             } else {
-                enemyRearguard[i].setX(520 - i * 300);
-                enemyRearguard[i].setY(300);
+                enemyRearguard[i].setX((float) (((520 - i * 300) / 0.00832813125) * (densityFactor / 160)));
+                enemyRearguard[i].setY((float) (36022.487037533180087669727827596 * (densityFactor / 160))); //300px
             }
             enemyRearguard[i].setImageResource(R.drawable.empty);
             enemyRearguard[i].setId(i);
@@ -178,8 +185,8 @@ public class MainActivity extends Activity {
         for (int i = 0; i < 6; i++) {
             damageZone[i] = new ImageView(this);
             damageZone[i].setAdjustViewBounds(true);
-            damageZone[i].setX(62);
-            damageZone[i].setY(650 + i * 45);
+            damageZone[i].setX((float) (7444.6473210901905514517437510366 * (densityFactor / 160))); //62px
+            damageZone[i].setY((float) (((650 + i * 45) / 0.00832813125) * (densityFactor / 160)));
             damageZone[i].setId(i);
             rl.addView(damageZone[i]);
         }
@@ -188,8 +195,8 @@ public class MainActivity extends Activity {
         for (int i = 0; i < 6; i++) {
             enemyDamageZone[i] = new ImageView(this);
             enemyDamageZone[i].setAdjustViewBounds(true);
-            enemyDamageZone[i].setX(640);
-            enemyDamageZone[i].setY(393 - i * 45);
+            enemyDamageZone[i].setX((float) (76847.972346737450853695419365539 * (densityFactor / 160))); //640px
+            enemyDamageZone[i].setY((float) (((393 - i * 45) / 0.00832813125) * (densityFactor / 160)));
             enemyDamageZone[i].setId(i);
             enemyDamageZone[i].setRotation(180);
             rl.addView(enemyDamageZone[i]);
@@ -198,8 +205,8 @@ public class MainActivity extends Activity {
         phases = new Button[6];
         for (int i = 0; i < 6; i++) {
             phases[i] = new Button(this);
-            phases[i].setX(100 + i * 100);
-            phases[i].setY(buttonY);
+            phases[i].setX((float) (((100 + i * 100) / 0.00832813125) * (densityFactor / 160)));
+            phases[i].setY((float) buttonY);
             rl.addView(phases[i]);
         }
 
@@ -213,9 +220,9 @@ public class MainActivity extends Activity {
         Player.setPhase(Phase.DP);
 
         deckSize = new TextView(this);
-        deckSize.setX(715);
-        deckSize.setY(765);
-        deckSize.setText(String.valueOf(60));
+        deckSize.setX((float) (85853.594106120745875612851322438 * (densityFactor / 160))); //715px
+        deckSize.setY((float) (91857.341945709609223557805960371 * (densityFactor / 160))); //765px
+        deckSize.setText(String.valueOf("Cannot currently retrieve deck size."));
         deckSize.setText(String.valueOf(Player.deck.size()));
         deckSize.setTextColor(Color.RED);
         rl.addView(deckSize);
@@ -225,7 +232,6 @@ public class MainActivity extends Activity {
             enemy.draw();
             Field.setPositions();
         }
-
         setContentView(rl);
     }
 
@@ -237,16 +243,20 @@ public class MainActivity extends Activity {
         switch (me.getAction()) {
             case MotionEvent.ACTION_UP:
                 if (Player.getPhase().equals(Phase.DP)) {
-                    if (x >= 650 && x <= 800) {
-                        if (y >= 675 && y <= 900) {
+                    //650px to 800px
+                    if (x >= (78048.721914655223523284410293125 * (densityFactor / 160)) && x <= (96059.965433421813567119274206924 * (densityFactor / 160))) {
+                        //675px to 900px
+                        if (y >= (81050.595834449655197256887612092 * (densityFactor / 160)) && y <= (108067.46111259954026300918348279 * (densityFactor / 160))) {
                             player.draw();
                             Field.setPositions();
                             //Player.setPhase(Phase.RP);
                         }
                     }
                 } else if (Player.getPhase().equals(Phase.EP)) {
-                    if (x >= 650 && x <= 800) {
-                        if (y >= 675 && y <= 900) {
+                    //650px to 800px
+                    if (x >= (78048.721914655223523284410293125 * (densityFactor / 160)) && x <= (96059.965433421813567119274206924 * (densityFactor / 160))) {
+                        //675px to 900px
+                        if (y >= (81050.595834449655197256887612092 * (densityFactor / 160)) && y <= (108067.46111259954026300918348279 * (densityFactor / 160))) {
                             player.takeDamage();
                         }
                     }

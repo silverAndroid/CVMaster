@@ -9,17 +9,19 @@ import android.widget.ImageView;
 /**
  * Created by Rushil Perera on 31/07/2014.
  */
+
 public class Field {
 
-    static final int playerHandY = 1000;
-    static final int enemyHandY = 10;
-
+    static double playerHandY;
+    static double enemyHandY;
     static boolean playerTurn;
 
     private static MainActivity ma;
 
     public Field(MainActivity mainActivity) {
         ma = mainActivity;
+        playerHandY = 120074.95679177726695889909275865 * (MainActivity.densityFactor / 160); //1000px
+        enemyHandY = 1200.7495679177726695889909275865 * (MainActivity.densityFactor / 160); //10px
     }
 
     public static void viewDetails(String location, int position) {
@@ -50,7 +52,7 @@ public class Field {
 
         for (int i = 0; i <= Player.hand.size(); i++) {
             try {
-                int tempImageX = 400 - (Player.hand.size() * 25);
+                int tempImageX = (int) (((400 - (Player.hand.size() * 25)) / 0.00832813125) * (MainActivity.densityFactor / 160));
                 if (Player.handImages[i] == null)
                     Player.handImages[i] = new ImageView(ma);
                 if (Player.hand.size() == 0)
@@ -73,22 +75,23 @@ public class Field {
                     Player.handImages[i].setX(tempImageX);
                 else
                     Player.handImages[i].setX(tempImageX + (50 * i));
-                Player.handImages[i].setY(playerHandY);
+                Player.handImages[i].setY((float) playerHandY);
                 Player.handImages[i].setId(i);
                 Player.handImages[i].setAdjustViewBounds(true);
                 Player.handImages[i].setOnClickListener(new OnHandClickListener(ma, MainActivity.player));
-                ma.rl.addView(Player.handImages[i]);
+                MainActivity.rl.addView(Player.handImages[i]);
             } catch (IndexOutOfBoundsException ioobe) {
                 break;
             } catch (IllegalStateException ise) {
-                ma.rl.removeView(Player.handImages[i]);
-                ma.rl.addView(Player.handImages[i]);
+                MainActivity.rl.removeView(Player.handImages[i]);
+                MainActivity.rl.addView(Player.handImages[i]);
             }
+            ma.setContentView(MainActivity.rl);
         }
 
         for (int i = 0; i < Enemy.hand.size(); i++) {
             try {
-                int tempImageX = 400 - (Enemy.hand.size() * 25);
+                int tempImageX = (int) (((400 - (Enemy.hand.size() * 25)) / 0.00832813125) * (MainActivity.densityFactor / 160));
                 if (Enemy.handImages[i] == null)
                     Enemy.handImages[i] = new ImageView(ma);
                 if (Enemy.hand.size() == 0)
@@ -111,15 +114,15 @@ public class Field {
                     Enemy.handImages[i].setX(tempImageX);
                 else
                     Enemy.handImages[i].setX(tempImageX + (50 * i));
-                Enemy.handImages[i].setY(enemyHandY);
+                Enemy.handImages[i].setY((float) enemyHandY);
                 Enemy.handImages[i].setId(i);
                 Enemy.handImages[i].setAdjustViewBounds(true);
-                ma.rl.addView(Enemy.handImages[i]);
+                MainActivity.rl.addView(Enemy.handImages[i]);
             } catch (IndexOutOfBoundsException ioobe) {
                 break;
             } catch (IllegalStateException ise) {
-                ma.rl.removeView(Enemy.handImages[i]);
-                ma.rl.addView(Enemy.handImages[i]);
+                MainActivity.rl.removeView(Enemy.handImages[i]);
+                MainActivity.rl.addView(Enemy.handImages[i]);
             }
         }
     }
