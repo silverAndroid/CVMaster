@@ -1,15 +1,21 @@
 package co.cvmaster.studio;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesStatusCodes;
@@ -22,6 +28,7 @@ import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListene
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import com.google.example.games.basegameutils.BaseGameActivity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,9 +43,12 @@ public class MainMenuActivity extends BaseGameActivity implements View.OnClickLi
     final static int RC_SELECT_PLAYERS = 10000;
     final static int RC_INVITATION_INBOX = 10001;
     final static int RC_WAITING_ROOM = 10002;
+
     String mRoomId = null;
     ArrayList<Participant> opponents = null;
     String mMyId = null;
+    Spinner deckList;
+    ArrayList<String> deckListNames;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +82,47 @@ public class MainMenuActivity extends BaseGameActivity implements View.OnClickLi
             btnSignOut.setVisibility(View.GONE);
         } else if (v.getId() == R.id.btn_quick_fight) {
             if (isSignedIn()) {
-                Log.d("quickFightSignedIn", Boolean.toString(isSignedIn()));
-                startQuickGame();
+                // custom dialog
+                final Dialog dialog = new Dialog(this);
+                dialog.setContentView(R.layout.activity_deck_select);
+                dialog.setTitle("Select a Deck");
+
+                deckList = (Spinner) dialog.findViewById(R.id.deck_names);
+                deckListNames = new ArrayList<String>();
+
+                File deck = new File(this.getFilesDir().getPath());
+                File[] deckFiles;
+                if (deck.listFiles() != null) {
+                    deckFiles = deck.listFiles();
+                } else {
+                    throw new NullPointerException("No Files located");
+                }
+
+                for (int i = 0; i < deckFiles.length; i++) {
+                    if (!deckFiles[i].getName().equals("Database"))
+                        deckListNames.add(deckFiles[i].getName().replace(".txt", ""));
+
+                    Log.d("deckFiles", deckFiles[i].getName());
+                    Log.d("deckListNames", deckListNames.get(i));
+                }
+
+                ArrayAdapter<String> stringArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, deckListNames);
+                deckList.setAdapter(stringArrayAdapter);
+                deckList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        Toast.makeText(MainMenuActivity.this, deckListNames.get(position), Toast.LENGTH_SHORT).show();
+                        MainActivity.playerDeckName = deckListNames.get(position);
+                        startQuickGame();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                dialog.show();
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("You must sign-in in order to access this feature.")
@@ -96,7 +145,7 @@ public class MainMenuActivity extends BaseGameActivity implements View.OnClickLi
         }
     }
 
-    private void startQuickGame() {
+    public void startQuickGame() {
         // auto-match criteria to invite one random automatch opponent.
         // You can also specify more opponents (up to 3).
         Bundle am = RoomConfig.createAutoMatchCriteria(1, 1, 0);
@@ -180,7 +229,6 @@ public class MainMenuActivity extends BaseGameActivity implements View.OnClickLi
         if (i != GamesStatusCodes.STATUS_OK) {
             throw new IllegalStateException("onRoomCreated, status " + i);
         }
-        Log.d("onRoomCreated", Integer.toString(i));
         Intent iMultiplayer = Games.RealTimeMultiplayer.getWaitingRoomIntent(getApiClient(), room, Integer.MAX_VALUE);
         startActivityForResult(iMultiplayer, RC_WAITING_ROOM);
         Log.d("onRoomCreated", "Opening Waiting Room");
@@ -191,7 +239,6 @@ public class MainMenuActivity extends BaseGameActivity implements View.OnClickLi
         if (i != GamesStatusCodes.STATUS_OK) {
             throw new IllegalStateException("onJoinedRoom, status " + i);
         }
-        Log.d("onJoinedRoom", Integer.toString(i));
         Intent iMultiplayer = Games.RealTimeMultiplayer.getWaitingRoomIntent(getApiClient(), room, Integer.MAX_VALUE);
         startActivityForResult(iMultiplayer, RC_WAITING_ROOM);
         Log.d("onJoinedRoom", "Opening Waiting Room");
@@ -204,7 +251,6 @@ public class MainMenuActivity extends BaseGameActivity implements View.OnClickLi
 
     @Override
     public void onRoomConnected(int i, Room room) {
-        Log.d("onRoomConnected", Integer.toString(i));
         if (i != GamesStatusCodes.STATUS_OK) {
             throw new IllegalStateException("onRoomConnected, status " + i);
         }
@@ -258,12 +304,16 @@ public class MainMenuActivity extends BaseGameActivity implements View.OnClickLi
         Log.d("onConnectedToRoom", mRoomId);
         Log.d("onConnectedToRoom", mMyId);
         Log.d("onConnectedToRoom", "<< CONNECTED TO ROOM >>");
+
+        Intent iMA = new Intent(this, MainActivity.class);
+        startActivity(iMA);
     }
 
     @Override
     public void onDisconnectedFromRoom(Room room) {
         mRoomId = null;
         showAlert("Disconnected", "Disconnected from room");
+        Log.d("onDisconnectedFromRoom", "Disconnected from room");
     }
 
     @Override
