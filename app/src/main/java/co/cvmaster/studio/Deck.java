@@ -19,15 +19,15 @@ public class Deck {
     ArrayList<Card> deck;
     ArrayList<Card> enemyDeck;
 
-    public Deck(Database database, Context c) {
+    public Deck(Database database, Context c, String playerDeckName, String opponentDeckName) {
         db = database;
         context = c;
         deck = new ArrayList<Card>();
         enemyDeck = new ArrayList<Card>();
-        create();
+        create(playerDeckName, opponentDeckName);
     }
 
-    public void create() {
+    public void create(String playerDeck, String opponentDeck) {
         File[] file = {new File(context.getFilesDir().getPath() + "/Royal Paladin.txt"), new File(context.getFilesDir().getPath() + "/Gold Paladin.txt")};
         try {
             if (!file[0].exists()) {
